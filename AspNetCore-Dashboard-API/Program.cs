@@ -11,20 +11,23 @@ builder.Services.AddSwaggerGen();
 
 // ======== MongoDB Configuration =========
 
-// ربط إعدادات MongoDB من appsettings.json
+
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings")
 );
 
-// إضافة MongoClient كـ Singleton
+
 builder.Services.AddSingleton<IMongoClient>(s =>
 {
     var settings = builder.Configuration.GetSection("MongoDBSettings").Get<MongoDBSettings>();
     return new MongoClient(settings.ConnectionString);
 });
 
-// ** تسجيل UserService كـ Singleton **
-builder.Services.AddSingleton<UserService>();  // <--- هذا ضروري
+
+builder.Services.AddSingleton<UserService>();
+
+
+builder.Services.AddSingleton<JwtService>();
 
 var app = builder.Build();
 
