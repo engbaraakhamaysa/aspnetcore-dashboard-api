@@ -1,9 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using AspNetCore_Dashboard_API.Models;
 using Microsoft.Extensions.Options;
-using AspNetCore_Dashboard_API.Models;
-using System.Collections.Generic;
-using System;
-using BCrypt.Net;
+using MongoDB.Driver;
 
 namespace AspNetCore_Dashboard_API.Services
 {
@@ -11,56 +8,25 @@ namespace AspNetCore_Dashboard_API.Services
     {
         private readonly IMongoCollection<User> _users;
 
-        public UserService(IMongoClient client, IOptions<MongoDBSettings> settings)
+        public UserService(IOptions<MongoDBSettings> settings)
         {
+            var client = new MongoClient(settings.Value.ConnectionString);
             var database = client.GetDatabase(settings.Value.DatabaseName);
+
+            // لاحظ هون انا ثبت اسم الكولكشن Users 
             _users = database.GetCollection<User>("Users");
         }
 
-        // Get all users (without Password)
-        public List<User> Get()
-        {
-            return _users.Find(u => true)
-                         .Project(u => new User
-                         {
-                             Id = u.Id,
-                             Name = u.Name,
-                             Email = u.Email,
-                             CreatedAt = u.CreatedAt
-                         })
-                         .ToList();
-        }
+        public async Task<User?> GetByEmailAsync(string email) =>
+            await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
 
-        // Create new user
-        public User Create(User user)
-        {
-            // Check if Email already exists
-            var existingUser = _users.Find(u => u.Email == user.Email).FirstOrDefault();
-            if (existingUser != null)
-                throw new Exception("Email already exists");
+        public async Task<User?> GetByIdAsync(string id) =>
+            await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
 
-            // Hash the password
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        public async Task CreateAsync(User user) =>
+            await _users.InsertOneAsync(user);
 
-            // Set CreatedAt
-            user.CreatedAt = DateTime.UtcNow;
-
-            _users.InsertOne(user);
-            return user;
-        }
-
-        // Optional: Get user by Id
-        public User? GetById(string id)
-        {
-            return _users.Find(u => u.Id == id)
-                         .Project(u => new User
-                         {
-                             Id = u.Id,
-                             Name = u.Name,
-                             Email = u.Email,
-                             CreatedAt = u.CreatedAt
-                         })
-                         .FirstOrDefault();
-        }
+        public async Task UpdateAsync(User user) =>
+            await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
     }
 }
