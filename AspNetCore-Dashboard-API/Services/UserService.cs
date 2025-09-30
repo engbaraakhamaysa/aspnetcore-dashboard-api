@@ -13,7 +13,7 @@ namespace AspNetCore_Dashboard_API.Services
             var client = new MongoClient(settings.Value.ConnectionString);
             var database = client.GetDatabase(settings.Value.DatabaseName);
 
-            // لاحظ هون انا ثبت اسم الكولكشن Users 
+ 
             _users = database.GetCollection<User>("Users");
         }
 
