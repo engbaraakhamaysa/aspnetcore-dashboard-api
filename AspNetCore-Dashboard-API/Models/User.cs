@@ -17,5 +17,11 @@ namespace AspNetCore_Dashboard_API.Models
 
         [BsonElement("Password")] 
         public string Password { get; set; }
+
+        [BsonElement("createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [BsonElement("token")]
+        public string Token { get; set; }
     }
 }
