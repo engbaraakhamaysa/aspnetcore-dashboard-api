@@ -116,5 +116,66 @@ WHERE price BETWEEN 500 AND 1500;
 
 --15- LIKE 
 SELECT * FROM products
-WHERE name LIKE '%l%';
+WHERE name LIKE '%Laptop%';
 
+
+--16- IN
+SELECT * FROM products
+WHERE category_id IN (3,4);
+
+--17- Subquery Products that are more expensive than average
+
+SELECT * FROM products
+WHERE price > (
+    SELECT AVG(price)
+    FROM products
+);
+
+
+--18- EXISTS
+SELECT name FROM categories c
+WHERE EXISTS(
+    SELECT 1
+    FROM products p
+    WHERE p.category_id = c.id
+);
+
+--19- Window Function Sort products by price
+SELECT 
+    name,
+    price,
+    RANK() OVER (ORDER BY price DESC) AS price_rank
+FROM products;
+
+--20- VIEW Create a product view with categories
+CREATE VIEW product_datails AS 
+SELECT
+    p.id,
+    p.name,
+    p.price,
+    p.stock,
+    c.name AS category_name
+FROM products p
+JOIN categories c
+ON p.category_id = c_id;
+
+--Using View
+SELECT * FROM product_details;
+
+--📌 22. Transaction 🔥
+BEGIN;
+
+UPDATE products
+SET stock = stock - 1
+WHERE id = 1;
+
+UPDATE products
+SET stock = stock + 1
+WHERE id = 2;
+
+COMMIT;
+
+
+-- 21. INDEX
+CREATE INDEX idx_products_name
+ON products(name);
