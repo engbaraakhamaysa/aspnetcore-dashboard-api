@@ -7,7 +7,6 @@ INSERT INTO payments (
     paid_at
 )
 VALUES
-
 -- Payment 1
 (7, 'credit_card', 'paid', NOW()),
 
@@ -27,5 +26,9 @@ RETURNING *;
 DELETE FROM payment
 WHERE id = 3
 RETURNING *;
+
+SELECT * FROM payments
+WHERE id = 1;
+
 
 
